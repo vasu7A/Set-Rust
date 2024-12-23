@@ -1,28 +1,32 @@
-use std::collections::HashSet;
-use std::hash::Hash;
-
 #[derive(Debug, Clone)]
 struct MathSet<T> {
-    elements: HashSet<T>,
+    elements: Vec<T>,
 }
 
-impl<T> MathSet<T> where T: Eq + Hash + Clone, {
-    fn new() -> Self{
-        Self{
-            elements: HashSet::new(),
+impl<T> MathSet<T> where T: Eq + Clone {
+    fn new() -> Self {
+        Self {
+            elements: Vec::new(),
         }
     }
 
     fn add(&mut self, value: T) {
-        self.elements.insert(value);
+        if !self.contains(&value) {
+            self.elements.push(value);
+        }
     }
 
-    fn remove(&mut self, value: &T) -> bool{
-        self.elements.remove(value)
+    fn remove(&mut self, value: &T) -> bool {
+        if let Some(pos) = self.elements.iter().position(|x| x == value) {
+            self.elements.remove(pos);
+            true
+        } else {
+            false
+        }
     }
 
-    fn contains(&self, value: &T) -> bool{
-        self.elements.contains(value)
+    fn contains(&self, value: &T) -> bool {
+        self.elements.iter().any(|x| x == value)
     }
 
     fn union(&self, other: &MathSet<T>) -> MathSet<T> {
@@ -53,13 +57,12 @@ impl<T> MathSet<T> where T: Eq + Hash + Clone, {
         result
     }
 
-    
     fn elements(&self) -> Vec<T> {
-        self.elements.iter().cloned().collect()
+        self.elements.clone()
     }
 }
 
-fn main(){
+fn main() {
     let mut set1 = MathSet::new();
     set1.add(1);
     set1.add(2);
@@ -69,7 +72,6 @@ fn main(){
     set2.add(3);
     set2.add(4);
     set2.add(5);
-
 
     println!("Set1: {:?}", set1.elements());
     println!("Set2: {:?}", set2.elements());
@@ -85,5 +87,4 @@ fn main(){
 
     let remove = set1.remove(&3);
     println!("Remove: {:?}", remove);
-
 }
